@@ -1,18 +1,21 @@
-import { fileURLToPath, URL } from 'node:url'
+/*
+ * vite.config.js
+ * Vite configuration for the hex-sight-game-2 vanilla-JS + Three.js project.
+ */
 
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
+import { fileURLToPath, URL } from 'node:url';
+import { defineConfig } from 'vite';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    vueDevTools(),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    },
-  },
-})
+	resolve: {
+		alias: {
+			'@': fileURLToPath(new URL('./src', import.meta.url)),
+		},
+	},
+	server: {
+		// Large model files (~18 MB VRM) — bump the asset size budget so dev
+		// server stops emitting noisy warnings.
+		fs: { strict: false },
+	},
+});
