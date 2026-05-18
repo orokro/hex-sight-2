@@ -68,6 +68,11 @@
 				border-color: #6a8fc5;
 			}
 
+			#ui button:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+			}
+
 			#status {
 				font-size: 11px;
 				color: #9aa0a8;
@@ -81,6 +86,9 @@
 				<button id="btn-glb">GLB</button>
 				<button id="btn-vrm">VRM</button>
 				<button id="btn-both">Both</button>
+			</div>
+			<div class="row">
+				<button id="btn-play" disabled>Play</button>
 			</div>
 			<div id="status">Initializing…</div>
 		</div>

@@ -1,13 +1,17 @@
 /*
  * avatar-loader.js
- * Loaders for GLB (plain glTF binary) and VRM (VRoid-style avatar)
- * assets. The VRM loader uses @pixiv/three-vrm via GLTFLoader's plugin
- * mechanism. Both functions return a normalized handle so the caller can
- * treat them interchangeably for scene attachment and per-frame updates.
+ * Loaders for GLB (plain glTF binary), VRM (VRoid-style avatar), and FBX
+ * (used here purely as an animation container — Mixamo "without skin"
+ * exports). The VRM loader uses @pixiv/three-vrm via GLTFLoader's plugin
+ * mechanism. The GLB/VRM functions return a normalized handle so the caller
+ * can treat them interchangeably for scene attachment and per-frame
+ * updates. The FBX function returns just the source root and clips since
+ * the FBX is not rendered — its skeleton is only used as a retarget source.
  */
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm';
 
 /**
@@ -20,8 +24,13 @@ import { VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm';
  */
 
 /**
- * Make every mesh under `root` cast + receive shadows. Cheap pass we apply
- * to both loader paths so the demo scene is consistent.
+ * @typedef {Object} FBXAnimationBundle
+ * @property {THREE.Object3D}        root   FBX scene root (contains Mixamo bone hierarchy).
+ * @property {THREE.AnimationClip[]} clips  Animation clips found in the FBX.
+ */
+
+/**
+ * Make every mesh under `root` cast + receive shadows.
  * @param {THREE.Object3D} root
  */
 function enableShadows(root) {
@@ -115,4 +124,18 @@ export async function loadVRM(url) {
 			VRMUtils.deepDispose(vrm.scene);
 		},
 	};
+}
+
+/**
+ * Load a Mixamo "without skin" FBX. Returns only the bone hierarchy and
+ * the animation clip(s); the FBX is not meant to be added to the scene.
+ *
+ * @param {string} url
+ * @returns {Promise<FBXAnimationBundle>}
+ */
+export async function loadFBXAnimation(url) {
+	const loader = new FBXLoader();
+	const root = await loader.loadAsync(url);
+	const clips = root.animations ?? [];
+	return { root, clips };
 }
